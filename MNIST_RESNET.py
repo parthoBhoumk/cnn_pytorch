@@ -27,30 +27,45 @@ for param in model_1.parameters():
 
                               # changing the output featers as my class number(10 for MNIST)
 
+
 num_features = model_1.fc.in_features
 model_1.fc = nn.Linear(num_features,10)
-model_1.fc.out_features 
-
-                                     
+                       
 
                                     #loading normalized data
-digit_data_set = torchvision.datasets.MNIST(
+digit_train_set = torchvision.datasets.MNIST(
     
-        "./data_lenet",    
-        train = True
-        ,download=True
+        "./data_cifar",    
+        train = True,
+        download=True
         ,transform = transforms.Compose([
             transforms.Resize((224,224)),
             transforms.Grayscale(num_output_channels=3),
             transforms.ToTensor(),
-            transforms.Normalize((.1307,1307,1307),(2890,2890,2890))
+             transforms.Normalize((0.1307,0.1307,0.1307),(0.3081,0.3081,0.3081))
             
             
         ])
     
 )
 
-digit_train_set, digit_valid_set = torch.utils.data.dataset.random_split(digit_data_set,[50000,10000])
+digit_valid_set = torchvision.datasets.MNIST(
+    
+        "./data_cifar",    
+        train = False,
+        download=True
+        ,transform = transforms.Compose([
+            transforms.Resize((224,224)),
+            transforms.Grayscale(num_output_channels=3),
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,0.1307,0.1307),(0.3081,0.3081,0.3081))
+            
+            
+        ])
+    
+)
+
+
 model_1 = model_1.cuda()
 
 digit_train_loader = DataLoader(digit_train_set, batch_size=100,num_workers=1, shuffle=True)
@@ -104,5 +119,4 @@ for epoch in range(epochs):
         valid_accuracy = valid_correct/len(digit_valid_set)
 
     print("epoch: ", epoch+1 , "train loss:", train_loss, "train_accuracy:" ,train_accuracy, "valid_loss:", valid_loss, "valid_accuracy", valid_accuracy )
-
 
